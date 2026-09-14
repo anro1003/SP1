@@ -10,6 +10,8 @@ public class Main {
     static boolean heroIsAlive = true;
     static char heroClass = 'W';
 
+    static final int heroXPPerLevel = 400;
+
     static double heroHealthWarningPercentage = 0.25;
 
     static String[] heroInventory = {"Sword", "Bow", "Arrow"};
@@ -17,7 +19,7 @@ public class Main {
 
     public static void main(String[] args) {
 
-        int simulatorEnemies = 2;
+        int simulatorEnemies = 120;
 
         printCharacterSheet();
         printHeroStatus();
@@ -53,11 +55,11 @@ public class Main {
         return generated;
     }
 
-    //The 3 stats are ordered as "HP", "MP", "ARMOR", DMG
+    //The 3 stats are ordered as "HP", "MP", "ARMOR", DMG, XPGAIN
     public static int[][] generateEnemyStats(String[] enemyTypes)
     {
 
-        int statCount = 4;
+        int statCount = 5;
         int[][] generated = new int[enemyTypes.length][statCount];
         for(int i = 0; i < enemyTypes.length; i++)
         {
@@ -69,18 +71,21 @@ public class Main {
                     generated[i][1] = (int)(Math.random() * 10 + 0); //from 0 to 10 //MP
                     generated[i][2] = (int)(Math.random() * 2 + 0); //from 0 to 2 //ARMOR
                     generated[i][3] = (int)(Math.random() * 5 + 3); //from 3 to 5 //DMG
+                    generated[i][4] = (int)(Math.random() * 100 + 15); //from 15 to 100 //XP GAIN
                     break;
                 case "Orc":
                     generated[i][0] = (int)(Math.random() * 35 + 15); //from 15 to 35 //HP
                     generated[i][1] = (int)(Math.random() * 0 + 0); //from 0 to 0 //MP
                     generated[i][2] = (int)(Math.random() * 6 + 2); //from 2 to 6 //ARMOR
                     generated[i][3] = (int)(Math.random() * 20 + 10); //from 10 to 20 //DMG
+                    generated[i][4] = (int)(Math.random() * 200 + 90); //from 90 to 200 //XP GAIN
                     break;
                 case "Dragon":
                     generated[i][0] = (int)(Math.random() * 135 + 50); //from 50 to 135 //HP
                     generated[i][1] = (int)(Math.random() * 400 + 200); //from 200 to 400 //MP
                     generated[i][2] = (int)(Math.random() * 24 + 10); //from 10 to 24 //ARMOR
                     generated[i][3] = (int)(Math.random() * 50 + 25); //from 25 to 50 //DMG
+                    generated[i][4] = (int)(Math.random() * 2500 + 1200); //from 1200 to 2500 //XP GAIN
                     break;
             }
         }
@@ -129,6 +134,9 @@ public class Main {
         final int mMPIndex = 1;
         final int mArmorIndex = 2;
         final int mDmgIndex = 3;
+        final int mXPGainIndex = 4;
+
+        int survivedRounds = 0;
 
         String[] enemyTypes = generateEnemyTypes(enemyCount);
         int[][] enemyStats = generateEnemyStats(enemyTypes);
@@ -137,6 +145,7 @@ public class Main {
             boolean monsterAlive = true;
             int monsterCurrHp = enemyStats[i][mHPIndex];
 
+            System.out.println("\n==== COMBAT ====");
             System.out.println("You met a " + enemyTypes[i] + "!!\n");
             System.out.println("We did a little analasys on them, and we saw these stats! :");
             System.out.println("HP: " + enemyStats[i][mHPIndex]+"\nMP: " + enemyStats[i][mMPIndex]+"\nArmor: " + enemyStats[i][mArmorIndex]+"\nBase Damage: "+enemyStats[i][mDmgIndex]+"\n\n");
@@ -151,6 +160,7 @@ public class Main {
                 if(!heroIsAlive)
                 {
                     System.out.println("You were killed by the " + enemyTypes[i] + " - Game over!");
+                    System.out.println("============");
                     break;
                 }
 
@@ -169,11 +179,22 @@ public class Main {
             {
                 break;
             }
+            survivedRounds++;
             System.out.println("You defeated the " + enemyTypes[i] + "!!! - You get to drink a small health potion!");
             heal(heroLevel+12); //hp potion
-            System.out.println("Current health: " + heroHP + " HP");
+            System.out.println("\nCurrent health: " + heroHP + " HP\n");
+            System.out.println("\n==== LOOT ====");
+            System.out.println("You gained: " + enemyStats[i][mXPGainIndex] + " XP! [" + heroXP + "/" + heroXPPerLevel*heroLevel+"]");
+            addXP(enemyStats[i][mXPGainIndex]);
+            System.out.println("==============");
 
         }
+        System.out.println("==== COMBAT SIM STATS ====");
+        System.out.println("Total rounds: " + survivedRounds);
+        System.out.println("Ended at level: " + heroLevel);
+        System.out.println("Ended with: " + heroXP + "/" + heroXPPerLevel*heroLevel + " XP");
+        System.out.println("Ended with: " + heroHP + "/" + heroMaxHP + " HP");
+        System.out.println("\n==== COMBAT SIMULATOR ENDED ====");
     }
 
     public static void printCharacterSheet()
@@ -239,9 +260,10 @@ public class Main {
         }
 
 
-        if (heroXP >= heroXP * 1250 && heroIsAlive) {
-            System.out.println("Ready to level up!!");
-            anyNews = true;
+        if(levelUpReady() && heroIsAlive)
+        {
+                System.out.println("Ready to level up!!");
+                anyNews = true;
         }
 
         if(!anyNews)
@@ -286,16 +308,31 @@ public class Main {
         heroGold -= gold;
     }
 
+    public static boolean levelUpReady()
+    {
+        if (heroXP >= heroLevel * heroXPPerLevel) {
+            return true;
+        }
+        return false;
+    }
     public static void addXP(int xp)
     {
         heroXP += xp;
+        while (levelUpReady()) {
+            System.out.println("\n\n==== LEVEL UP! ====");
+            levelUp();
+            System.out.println("New max health: " + heroMaxHP + " HP");
+            System.out.println("=======================\n\n");
+        }
     }
 
     public static void levelUp()
     {
         heroLevel++;
-        heroXP = 0;
-        heroMaxHP += 15;
+
+        heroXP -= heroXPPerLevel;
+        heroMaxHP += 20;
+        heroHP = heroMaxHP;
     }
 
     public static boolean isHealthCritical()
@@ -317,6 +354,6 @@ public class Main {
     }
     public static int getHeroDmg()
     {
-        return (int)(Math.random() * (heroLevel*14) + heroLevel+2);
+        return (int)(Math.random() * (heroLevel*5) + (heroLevel*3));
     }
 }

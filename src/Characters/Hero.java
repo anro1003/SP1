@@ -61,4 +61,29 @@ public class Hero extends CharacterBase {
         }
     }
 
+    public void printCharacterSheet()
+    {
+        ArrayList<ItemBase> equipped = getEquipedItems();
+        System.out.println("==== CHARACTER SHEET ====\nName: " + this.name + "\nLevel: " + this.level + "\nHP: " + this.HP + "/" + this.maxHP + "\nMP: " + this.MP + "/" + this.maxMP + "\nXP: " + this.xp);
+        System.out.println("== Inventory ==");
+        for(ItemBase item : items)
+        {
+            System.out.print("- " + item.getName());
+            if(Equipable.class.isAssignableFrom(item.getClass()))
+            {
+                if(equipped.stream().filter( equippedItem -> equippedItem.getName().equals(item.getName())).count() > 0)
+                {
+                    System.out.print(" [Equipped in:" + item.getItemSlot() + " Slot]");
+                }
+                else
+                {
+                    System.out.print(" [Equipable]");
+                }
+            }
+            System.out.print("\n");
+        }
+        System.out.println("====");
+        System.out.println("========");        
+    }
+
 }

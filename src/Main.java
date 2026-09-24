@@ -23,6 +23,9 @@ public class Main {
         assasinHero.addToInventory(GenericArmors.getGenericArmor(GenericArmorType.LEATHER, ItemSlot.HEAD),true);
         assasinHero.addToInventory(new FrostArmor(),true);
 
+        warriorHero.printCharacterSheet();
+        assasinHero.printCharacterSheet();
+
         CombatSimulator combatSimulator = new CombatSimulator();
         combatSimulator.oneOnOne(warriorHero,assasinHero);
 

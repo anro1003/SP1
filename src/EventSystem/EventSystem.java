@@ -10,7 +10,7 @@ import java.util.HashMap;
 public class EventSystem {
     private HashMap<String, ArrayList<Subscriber>> dispatchMap;
     public static EventSystem globalEventSystemSingleton = new EventSystem();
-    public EventSystem()
+    private EventSystem()
     {
         dispatchMap =  new HashMap<>();
     }

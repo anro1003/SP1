@@ -64,7 +64,7 @@ public class Hero extends CharacterBase {
     public void printCharacterSheet()
     {
         ArrayList<ItemBase> equipped = getEquipedItems();
-        System.out.println("==== CHARACTER SHEET ====\nName: " + this.name + "\nLevel: " + this.level + "\nHP: " + this.HP + "/" + this.maxHP + "\nMP: " + this.MP + "/" + this.maxMP + "\nXP: " + this.xp);
+        System.out.println("==== CHARACTER SHEET ====\nName: " + this.name + "\nLevel: " + this.level + "\nHP: " + this.HP + "/" + this.maxHP + "\nMP: " + this.MP + "/" + this.maxMP + "\nXP: " + this.xp + "\nClass: " + this.dungeonBaseClass.getName() + " (" + this.dungeonBaseClass.getClassShortName() + ")");
         System.out.println("== Inventory ==");
         for(ItemBase item : items)
         {
